@@ -1,16 +1,26 @@
 using UnityEngine;
 
-public class Pawn : MonoBehaviour
+public abstract class Pawn : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+    private Health health;
+    public Health Health 
+    {  
+        get { return health; }
+        set { health = value; }
     }
 
-    // Update is called once per frame
-    void Update()
+    private Shooter shooter;
+    public Shooter Shooter
     {
-        
+        get { return shooter; }
+        set { shooter = value; }
     }
+
+    public abstract void Move(Vector3 moveVector);
+    protected virtual void Start()
+    {
+        Health = GetComponentInChildren<Health>();
+        Shooter = GetComponentInChildren<Shooter>();
+    }
+
 }

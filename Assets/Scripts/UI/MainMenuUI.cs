@@ -6,7 +6,7 @@ public class MainMenuUI : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            //GameManager.Instance.ShowGameplay();
+            GameManager.Instance.ShowGameplay();
         }
     }
 

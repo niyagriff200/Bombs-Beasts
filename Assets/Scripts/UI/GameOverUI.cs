@@ -1,16 +1,28 @@
 using UnityEngine;
+using TMPro;
 
+// Displays score, high score,
 public class GameOverUI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI highScoreText;
+
+    private void Update()
     {
-        
+        if (GameManager.Instance != null)
+        {
+            scoreText.text = "Score: " + GameManager.Instance.Score.ToString("0000");
+            highScoreText.text = "High Score: " + GameManager.Instance.HighScore.ToString("0000");
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PlayAgain()
     {
-        
+        GameManager.Instance?.ShowGameplay();
+    }
+
+    public void MainMenu()
+    {
+        GameManager.Instance?.ShowMainMenu();
     }
 }
