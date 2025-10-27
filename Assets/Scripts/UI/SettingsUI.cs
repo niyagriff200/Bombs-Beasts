@@ -1,16 +1,20 @@
 using UnityEngine;
 
+// Handles navigation from settings screen
 public class SettingsUI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void Audio()
     {
-        
+        GameManager.Instance?.ShowAudioSettings();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Controls()
     {
-        
+        GameManager.Instance?.ShowControlsScreen();
+    }
+
+    public void MainMenu()
+    {
+        GameManager.Instance?.ShowMainMenu();
     }
 }

@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class PlayerHealth : Health
 {
     // Tracks remaining lives for the player
     private int startingLives;
     private int currentLives;
+    private AudioSource audioSource;
 
     protected override void Start()
     {
@@ -13,6 +15,12 @@ public class PlayerHealth : Health
         currentHealth = maxHealth;
         startingLives = GameManager.Instance.PlayerStartingLives;
         currentLives = startingLives;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     // Returns current number of lives (used by UI and win/lose logic)
@@ -24,6 +32,7 @@ public class PlayerHealth : Health
 
     protected override void Die()
     {
+        PlaySound(GameManager.Instance.PlayerDeathClip); // Play death sound
         currentLives--;
         GameManager.Instance.GameplayUI.UpdateLives(currentLives); // Update UI display
         Debug.Log("Player Lives: " + currentLives);
@@ -55,4 +64,20 @@ public class PlayerHealth : Health
             }
         }
     }
+    public override void TakeDamage(float amount)
+    {
+        base.TakeDamage(amount);
+        PlaySound(GameManager.Instance.PlayerDamageClip);
+    }
+
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip, 1.0f);
+        }
+    }
+
+
 }

@@ -12,10 +12,10 @@ public class FlyHealth : Health
 
     protected override void Die()
     {
-        // Award score for UFO kill
+        // Award score for Fly kill
         GameManager.Instance.AddScore(GameManager.Instance.FlyEnemyScore);
 
-        // Remove from activeEnemies and destroy—UFOs use DeathTarget
+        // Remove from activeEnemies and destroy—Fly use DeathTarget
         DeathTarget target = GetComponent<DeathTarget>();
         if (target != null)
         {

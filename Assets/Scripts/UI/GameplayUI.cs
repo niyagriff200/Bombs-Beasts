@@ -6,20 +6,23 @@ using UnityEngine.UI;
 // Updates score, health bar, and lives icons during gameplay
 public class GameplayUI : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText;
-    public Image healthBar;
-    public GameObject lifeIconPrefab;
-    public Transform livesContainer;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private Image healthBar;
+    [SerializeField] private GameObject lifeIconPrefab;
+    [SerializeField] private Transform livesContainer;
 
     private GameObject[] lifeIcons;
 
     private void Start()
     {
-        PlayerHealth health = GameManager.Instance.CurrentLevelData.Players[0].Pawn.Health as PlayerHealth;
-        if (health != null)
+        if (livesContainer.childCount == 0)
         {
-            InitializeLives(health.GetCurrentLives());
-            UpdateLives(health.GetCurrentLives());
+            PlayerHealth health = GameManager.Instance.CurrentLevelData.Players[0].Pawn.Health as PlayerHealth;
+            if (health != null)
+            {
+                InitializeLives(health.GetCurrentLives());
+                UpdateLives(health.GetCurrentLives());
+            }
         }
     }
 
@@ -30,27 +33,26 @@ public class GameplayUI : MonoBehaviour
         Health health = GameManager.Instance.CurrentLevelData.Players[0].Pawn.Health;
         healthBar.fillAmount = health.GetHealthPercent();
     }
-
-    public void InitializeLives(int totalLives)
-    {
-        
-        // Clear existing icons
+       public void InitializeLives(int totalLives)
+        {
         foreach (Transform child in livesContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Spawn icons based on totalLives
+        if (lifeIconPrefab == null)
+        {
+            return;
+        }
+
         lifeIcons = new GameObject[totalLives];
         for (int i = 0; i < totalLives; i++)
         {
             GameObject icon = Instantiate(lifeIconPrefab, livesContainer);
-
             lifeIcons[i] = icon;
-            Debug.Log("Initialized lives");
         }
 
-    }
+}
 
     public void UpdateLives(int currentLives)
     {

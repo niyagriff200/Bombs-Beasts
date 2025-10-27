@@ -145,6 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697a69345d937474fb96e84c6ac1cf5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BombPawn
+  explosionRadiusUIPrefab: {fileID: 5519381928080543071, guid: 3019295e79e904a43973291ccfc568ce, type: 3}
+  warningDuration: 1
 --- !u!114 &-7007722876384299918
 MonoBehaviour:
   m_ObjectHideFlags: 0

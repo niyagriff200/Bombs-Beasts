@@ -4,8 +4,8 @@ using TMPro;
 // Displays score, high score,
 public class GameOverUI : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI highScoreText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI highScoreText;
 
     private void Update()
     {

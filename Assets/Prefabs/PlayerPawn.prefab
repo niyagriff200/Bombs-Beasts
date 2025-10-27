@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -4925268801473276464}
   - component: {fileID: -3240492053858885701}
   - component: {fileID: -4462409393606246560}
+  - component: {fileID: 4096593309883070691}
   m_Layer: 7
   m_Name: PlayerPawn
   m_TagString: Untagged
@@ -185,7 +186,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.3
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -229,7 +230,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -330,6 +331,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ade9ba9cc4e68342a52f5d003e51623, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeathRecenter
+--- !u!81 &4096593309883070691
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240738301790927330}
+  m_Enabled: 1
 --- !u!1 &1897272727973749268
 GameObject:
   m_ObjectHideFlags: 0

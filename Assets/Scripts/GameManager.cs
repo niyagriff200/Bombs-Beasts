@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Game States")]
     [SerializeField] private GameObject splashScreenState;
+
     public GameObject SplashScreenState => splashScreenState;
 
     [SerializeField] private GameObject mainMenuState;
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject controlsState;
     public GameObject ControlsState => controlsState;
 
+    [SerializeField] GameObject audioSettingsState;
+    public GameObject AudioSettingsState => audioSettingsState;
 
     [Header("Level Data")]
     [SerializeField] private LevelData currentlevelData;
@@ -71,6 +74,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject diamondPrefab;
     public GameObject DiamondPrefab => diamondPrefab;
+
+    [SerializeField] private GameObject explosionRadiusPrefab;
+    public GameObject ExplosionRadiusPrefab => explosionRadiusPrefab;
 
 
     [Header("Audio Clips")]
@@ -135,12 +141,6 @@ public class GameManager : MonoBehaviour
     private Transform playerToFollow;
     public Transform PlayerToFollow => playerToFollow;
 
-    [SerializeField] private float dodgeProjectileTime; //Dodge a projectile every certain number of seconds...
-    public float DodgeProjectileTime => dodgeProjectileTime;
-
-    [SerializeField] private float dodgeSpeedMultiplier;
-    public float DodgeSpeedMultiplier => dodgeSpeedMultiplier;
-
     [SerializeField] private float flyStoppingDistance;
     public float FlyStoppingDistance => flyStoppingDistance;
 
@@ -185,20 +185,22 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float healAmount;
     public float HealAmount => healAmount;
 
+    [Header("Diamond Pickup Settings")]
+    [SerializeField] private float diamondFallSpeed;
+    public float DiamondFallSpeed => diamondFallSpeed;
 
     [Header("Score Value Settings")]
     [SerializeField] private float flyEnemyScore;
-    public float FlyEnemyScore
-    {
-        get => flyEnemyScore;
-        set => flyEnemyScore = value;
-    }
-
     [SerializeField] private float bombEnemyScore;
-    public float BombEnemyScore => bombEnemyScore;
-
+    private float zoomerEnemyScore = 0;
     [SerializeField] private float diamondScore;
+
+    public float FlyEnemyScore => flyEnemyScore;
+    public float BombEnemyScore => bombEnemyScore;
     public float DiamondScore => diamondScore;
+
+    public Dictionary<LevelData.EnemySpawnType, float> ScoreValues { get; private set; }
+
 
     [Header("Score Tracker")]
     [SerializeField] private float score;
@@ -227,14 +229,23 @@ public class GameManager : MonoBehaviour
             instance = this;
         }
 
+        ScoreValues = new Dictionary<LevelData.EnemySpawnType, float>
+    {
+        { LevelData.EnemySpawnType.Fly, flyEnemyScore },
+        { LevelData.EnemySpawnType.Bomb, bombEnemyScore },
+        { LevelData.EnemySpawnType.Zoomer, zoomerEnemyScore }
+    };
+
         ShowSplashScreen();
     }
+
 
     private void Start()
     {
         HighScore = PlayerPrefs.GetFloat("HighScore", 0f);
         AudioManager musicManager = Object.FindFirstObjectByType<AudioManager>();
         musicManager.PlayMenuMusic();
+        
     }
 
     private void Update()
@@ -246,7 +257,7 @@ public class GameManager : MonoBehaviour
 
         if (IsPlayerAlive())
         {
-            // If the controller is alive, *then* check if its pawn is null (destroyed)
+            // If the controller is alive, then check if its pawn is null (destroyed)
             if (CurrentLevelData.Players[0].Pawn == null)
             {
                 ShowGameOver();
@@ -263,6 +274,7 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(false);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
     }
 
     public void ShowMainMenu()
@@ -274,6 +286,7 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(false);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
     }
 
     public void ShowCreditsScreen()
@@ -285,6 +298,7 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(true);
         controlsState.SetActive(false);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
     }
 
     public void ShowControlsScreen()
@@ -296,6 +310,7 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(true);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
     }
 
     public void ShowSettingsScreen()
@@ -307,6 +322,19 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(false);
         settingsState.SetActive(true);
+        audioSettingsState.SetActive(false);
+    }
+
+    public void ShowAudioSettings()
+    {
+        splashScreenState.SetActive(false);
+        mainMenuState.SetActive(false);
+        gameplayState.SetActive(false);
+        gameOverState.SetActive(false);
+        creditsState.SetActive(false);
+        controlsState.SetActive(false);
+        settingsState.SetActive(false);
+        audioSettingsState.SetActive(true);
     }
 
     public void ShowGameplay()
@@ -318,7 +346,13 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(false);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
 
+        AudioListener playerListener = playerPawnPrefab.GetComponent<AudioListener>();
+        if (playerListener != null)
+        {
+            playerListener.enabled = true;
+        }
 
         CurrentLevelData.Players = new List<PlayerController>();
         CurrentLevelData.EnemySpawnTimer = 0f;
@@ -326,6 +360,16 @@ public class GameManager : MonoBehaviour
         Score = 0f;
 
         SpawnPlayer();
+
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            AudioListener listener = mainCam.GetComponent<AudioListener>();
+            if (listener != null)
+            {
+                listener.enabled = false;
+            }
+        }
 
         AudioManager musicManager = Object.FindFirstObjectByType<AudioManager>();
         musicManager.PlayGameplayMusic();
@@ -352,8 +396,10 @@ public class GameManager : MonoBehaviour
                     if (health != null)
                     {
 
-                        gameplayUI.InitializeLives(health.GetCurrentLives());
-                        gameplayUI.UpdateLives(health.GetCurrentLives());
+                        int totalLives = PlayerStartingLives;
+                        gameplayUI.InitializeLives(totalLives);
+                        gameplayUI.UpdateLives(totalLives);
+
                     }
                 }
             }
@@ -370,6 +416,17 @@ public class GameManager : MonoBehaviour
         creditsState.SetActive(false);
         controlsState.SetActive(false);
         settingsState.SetActive(false);
+        audioSettingsState.SetActive(false);
+
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            AudioListener listener = mainCam.GetComponent<AudioListener>();
+            if (listener != null)
+            {
+                listener.enabled = true;
+            }
+        }
 
         foreach (GameObject enemy in CurrentLevelData.ActiveEnemies)
         {
@@ -437,6 +494,13 @@ public class GameManager : MonoBehaviour
             {
                 SpawnHealPickup();
                 CurrentLevelData.HealSpawnTimer = 0f;
+            }
+
+            CurrentLevelData.DiamondSpawnTimer += Time.deltaTime;
+            if (CurrentLevelData.DiamondSpawnTimer >= CurrentLevelData.DiamondIntervalTimer)
+            {
+                SpawnDiamonds();
+                CurrentLevelData.DiamondSpawnTimer = 0f;
             }
         }
         
@@ -539,6 +603,16 @@ public class GameManager : MonoBehaviour
         LevelData.EnemySpawnType spawnType = GetEnemyType(enemyToSpawn);
         Vector3 spawnPoint = GetRandomSpawnPoint(spawnType);
 
+        if (enemyToSpawn == ZoomerEnemyPrefab)
+        {
+            AudioClip warningClip = ZoomerWarningClip;
+            if (warningClip != null)
+            {
+                AudioSource.PlayClipAtPoint(warningClip, CurrentLevelData.Players[0].transform.position, 1.0f);
+
+            }
+        }
+
         if (enemyToSpawn != null)
         {
             GameObject newEnemy = Instantiate(enemyToSpawn, spawnPoint, Quaternion.identity);
@@ -576,7 +650,7 @@ public class GameManager : MonoBehaviour
         if (score > highScore)
         {
             highScore = score;
-            PlayerPrefs.SetFloat("TopScore", highScore);
+            PlayerPrefs.SetFloat("HighScore", highScore);
             PlayerPrefs.Save();
         }
     }

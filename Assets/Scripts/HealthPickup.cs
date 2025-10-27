@@ -12,7 +12,7 @@ public class HealthPickup : MonoBehaviour
             healAmount = GameManager.Instance.HealAmount;
         }
     }
-    private void OnCollisionEnter2D(Collision2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         PlayerHealth playerHealth = other.gameObject.GetComponent<PlayerHealth>();
 
@@ -24,5 +24,4 @@ public class HealthPickup : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
 }

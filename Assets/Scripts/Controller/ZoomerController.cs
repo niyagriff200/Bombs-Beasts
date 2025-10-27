@@ -7,6 +7,7 @@ public class ZoomerController : Controller
 
     private void Start()
     {
+
         moveSpeed = GameManager.Instance.ZoomerMoveSpeed;
 
         // Determine direction based on spawn
@@ -34,16 +35,6 @@ public class ZoomerController : Controller
         {
             GameManager.Instance.RemoveEnemy(gameObject);
             Destroy(gameObject);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        // Example: damage player on contact
-        PlayerPawn player = other.GetComponent<PlayerPawn>();
-        if (player != null)
-        {
-            Destroy(gameObject); // Zoomer disappears on impact
         }
     }
 }

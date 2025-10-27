@@ -16,7 +16,7 @@ public class BombHealth : Health
         DeathTarget target = GetComponent<DeathTarget>();
         if (target != null)
         {
-            AudioSource.PlayClipAtPoint(GameManager.Instance.BombExplosionClip, transform.position, 1f);
+            AudioSource.PlayClipAtPoint(GameManager.Instance.BombExplosionClip, transform.position, .5f);
             target.Die(); // Handles removal and destruction
         }
     }
